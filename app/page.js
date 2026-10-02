@@ -8,12 +8,44 @@ export default function Home() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+async function saveBook(book) {
+  try {
+    const { error } = await supabase
+      .from("books")
+      .insert({
+        google_id: book.googleId,
+        title: book.title,
+        authors: book.authors,
+        publisher: book.publisher,
+        published_date: book.publishedDate,
+        description: book.description,
+        thumbnail: book.thumbnail,
+        categories: book.categories,
+        page_count: book.pageCount,
+        preview_link: book.previewLink,
+        status: "읽고 싶은 책",
+        memo: "",
+      });
 
-  async function searchBooks() {
-    if (!search.trim()) {
-      setError("책 제목이나 저자를 입력해주세요.");
+    if (error) {
+      if (error.code === "23505") {
+        alert("이미 내 책장에 있는 책입니다.");
+      } else {
+        console.error(error);
+        alert("책 저장에 실패했습니다.");
+      }
+
       return;
     }
+
+    alert("📚 내 책장에 책이 추가되었습니다!");
+  } catch (error) {
+    console.error(error);
+    alert("저장 중 오류가 발생했습니다.");
+  }
+}
+
 
     setLoading(true);
     setError("");
