@@ -235,7 +235,8 @@ async function saveBook(book) {
                   )}
 
                   <button
-                    className="mt-5 w-full rounded-xl border border-gray-200 py-3 text-sm font-semibold transition hover:bg-gray-50"
+                   onClick={() => saveBook(book)}
+                   className="mt-5 w-full rounded-xl border border-gray-200 py-3 text-sm font-semibold transition hover:bg-gray-50 hover:border-gray-400"
                   >
                     📚 내 책장에 추가
                   </button>
