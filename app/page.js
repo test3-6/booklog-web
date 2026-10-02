@@ -72,7 +72,7 @@ export default function Home() {
         return;
       }
 
-      alert("📚 내 책장에 책이 추가되었습니다!");
+      alert("책이 내 책장에 추가되었습니다!");
     } catch (err) {
       console.error(err);
       alert("저장 중 오류가 발생했습니다.");
@@ -80,19 +80,17 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F8FC] text-[#20242D]">
-      <header className="border-b border-gray-200 bg-white">
+    <main className="min-h-screen bg-gray-50 text-gray-900">
+      <header className="border-b bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#20242D] text-xl">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-900 text-xl">
               📚
             </div>
 
             <div>
               <h1 className="text-xl font-bold">BOOKLOG</h1>
-              <p className="text-xs text-gray-500">
-                나만의 독서 기록
-              </p>
+              <p className="text-xs text-gray-500">나만의 독서 기록</p>
             </div>
           </div>
 
@@ -101,17 +99,11 @@ export default function Home() {
               홈
             </a>
 
-            <a
-              href="#search"
-              className="text-gray-500 hover:text-gray-900"
-            >
+            <a href="#search" className="text-gray-500">
               책 검색
             </a>
 
-            <a
-              href="#bookshelf"
-              className="text-gray-500 hover:text-gray-900"
-            >
+            <a href="#bookshelf" className="text-gray-500">
               내 책장
             </a>
           </nav>
@@ -124,7 +116,7 @@ export default function Home() {
             MY READING SPACE
           </p>
 
-          <h2 className="text-4xl font-bold leading-tight tracking-tight md:text-6xl">
+          <h2 className="text-4xl font-bold leading-tight md:text-6xl">
             읽은 책을 기록하고,
             <br />
             다음 책을 찾아보세요.
@@ -132,12 +124,12 @@ export default function Home() {
 
           <p className="mt-6 max-w-2xl text-base leading-7 text-gray-500 md:text-lg">
             BOOKLOG는 책을 검색하고 나만의 독서 기록을
-            관리할 수 있는 개인 독서 관리 서비스입니다.
+            관리할 수 있는 독서 관리 서비스입니다.
           </p>
 
           <div
             id="search"
-            className="mt-10 flex max-w-2xl gap-3 rounded-2xl border border-gray-200 bg-white p-2 shadow-sm"
+            className="mt-10 flex max-w-2xl gap-3 rounded-2xl border bg-white p-2 shadow-sm"
           >
             <input
               type="text"
@@ -155,7 +147,7 @@ export default function Home() {
             <button
               onClick={searchBooks}
               disabled={loading}
-              className="rounded-xl bg-[#20242D] px-6 py-3 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50"
+              className="rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white disabled:opacity-50"
             >
               {loading ? "검색 중..." : "검색"}
             </button>
@@ -172,9 +164,7 @@ export default function Home() {
       {books.length > 0 && (
         <section className="mx-auto max-w-6xl px-6 pb-20">
           <div className="mb-6">
-            <h3 className="text-2xl font-bold">
-              검색 결과
-            </h3>
+            <h3 className="text-2xl font-bold">검색 결과</h3>
 
             <p className="mt-1 text-sm text-gray-500">
               총 {books.length}개의 책을 찾았습니다.
@@ -185,7 +175,7 @@ export default function Home() {
             {books.map((book) => (
               <article
                 key={book.googleId}
-                className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+                className="overflow-hidden rounded-2xl border bg-white shadow-sm"
               >
                 <div className="flex h-72 items-center justify-center bg-gray-100">
                   {book.thumbnail ? (
@@ -216,7 +206,7 @@ export default function Home() {
 
                   <button
                     onClick={() => saveBook(book)}
-                    className="mt-5 w-full rounded-xl border border-gray-200 py-3 text-sm font-semibold hover:bg-gray-50"
+                    className="mt-5 w-full rounded-xl border py-3 text-sm font-semibold hover:bg-gray-50"
                   >
                     📚 내 책장에 추가
                   </button>
@@ -252,7 +242,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-gray-200 bg-white">
+      <footer className="border-t bg-white">
         <div className="mx-auto max-w-6xl px-6 py-8 text-center text-xs text-gray-400">
           © 2026 BOOKLOG
         </div>
@@ -263,7 +253,7 @@ export default function Home() {
 
 function StatCard({ title, value, description }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6">
+    <div className="rounded-2xl border bg-white p-6">
       <p className="text-sm text-gray-500">{title}</p>
 
       <p className="mt-3 text-3xl font-bold">{value}</p>
