@@ -318,3 +318,4 @@ function StatCard({ title, value, description }) {
     </div>
   );
 }
+
