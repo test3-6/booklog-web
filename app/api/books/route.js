@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const q = searchParams.get("q");
+    const url = new URL(request.url);
+    const q = url.searchParams.get("q");
 
     if (!q) {
       return NextResponse.json(
@@ -23,13 +24,16 @@ export async function GET(request) {
       );
     }
 
-    const url =
-      `https://www.googleapis.com/books/v1/volumes` +
+    const googleUrl =
+      "https://www.googleapis.com/books/v1/volumes" +
       `?q=${encodeURIComponent(q)}` +
-      `&maxResults=12` +
+      "&maxResults=12" +
       `&key=${apiKey}`;
 
-    const response = await fetch(url);
+    const response = await fetch(googleUrl, {
+      cache: "no-store",
+    });
+
     const data = await response.json();
 
     if (!response.ok) {
@@ -66,7 +70,7 @@ export async function GET(request) {
 
     return NextResponse.json({ books });
   } catch (error) {
-    console.error(error);
+    console.error("Google Books API 오류:", error);
 
     return NextResponse.json(
       { error: "책 검색 중 오류가 발생했습니다." },
