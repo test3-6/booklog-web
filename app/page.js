@@ -106,6 +106,27 @@ export default function Home() {
     }
   }
 
+  async function updateBookStatus(bookId, newStatus) {
+  const { error } = await supabase
+    .from("books")
+    .update({ status: newStatus })
+    .eq("id", bookId);
+
+  if (error) {
+    console.error("상태 변경 오류:", error);
+    alert("책 상태 변경에 실패했습니다.");
+    return;
+  }
+
+  setSavedBooks((prevBooks) =>
+    prevBooks.map((book) =>
+      book.id === bookId
+        ? { ...book, status: newStatus }
+        : book
+    )
+  );
+}
+
   // 통계
   const totalBooks = savedBooks.length;
 
@@ -348,9 +369,17 @@ export default function Home() {
                         "저자 정보 없음"}
                     </p>
 
-                    <div className="mt-4 inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
-                      {book.status || "읽고 싶은 책"}
-                    </div>
+                    <select
+                      value={book.status || "읽고 싶은 책"}
+                      onChange={(event) =>
+                        updateBookStatus(book.id, event.target.value)
+                      }
+                      className="mt-4 w-full rounded-xl border bg-white px-3 py-2 text-sm outline-none"
+                    >
+                      <option value="읽고 싶은 책">📕 읽고 싶은 책</option>
+                      <option value="읽는 중">📖 읽는 중</option>
+                      <option value="읽은 책">✅ 읽은 책</option>
+                    </select>
                   </div>
                 </article>
               ))}
