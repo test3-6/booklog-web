@@ -1,16 +1,8 @@
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const q = searchParams.get("q");
 
-    if (!q) {
-      return NextResponse.json(
-        { error: "검색어가 필요합니다." },
-        { status: 400 }
-      );
-    }
+export const dynamic = "force-dynamic";
 
     const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
 
