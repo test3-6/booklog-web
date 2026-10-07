@@ -197,8 +197,8 @@ export default function Home() {
               책 검색
             </a>
 
-            <a href="#bookshelf" className="text-gray-500">
-              내 책장
+            <a href="/library">
+              내 서재
             </a>
           </nav>
 
