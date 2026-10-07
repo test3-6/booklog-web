@@ -6,9 +6,31 @@ import { supabase } from "../lib/supabase";
 export default function Home() {
   const [search, setSearch] = useState("");
   const [books, setBooks] = useState([]);
+  const [savedBooks, setSavedBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // 페이지가 처음 열릴 때 내 책장 불러오기
+  useEffect(() => {
+    loadBooks();
+  }, []);
+
+  // Supabase에서 저장된 책 가져오기
+  async function loadBooks() {
+    const { data, error } = await supabase
+      .from("books")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("책 불러오기 오류:", error);
+      return;
+    }
+
+    setSavedBooks(data || []);
+  }
+
+  // Google Books 검색
   async function searchBooks() {
     if (!search.trim()) {
       setError("책 제목이나 저자를 입력해주세요.");
@@ -43,6 +65,7 @@ export default function Home() {
     }
   }
 
+  // 책을 Supabase에 저장
   async function saveBook(book) {
     try {
       const { error: saveError } = await supabase
@@ -66,21 +89,37 @@ export default function Home() {
         if (saveError.code === "23505") {
           alert("이미 내 책장에 있는 책입니다.");
         } else {
-          console.error(saveError);
+          console.error("책 저장 오류:", saveError);
           alert("책 저장에 실패했습니다.");
         }
+
         return;
       }
 
       alert("책이 내 책장에 추가되었습니다!");
+
+      // 저장 후 책장 다시 불러오기
+      loadBooks();
     } catch (err) {
       console.error(err);
       alert("저장 중 오류가 발생했습니다.");
     }
   }
 
+  // 통계
+  const totalBooks = savedBooks.length;
+
+  const readingBooks = savedBooks.filter(
+    (book) => book.status === "읽는 중"
+  ).length;
+
+  const finishedBooks = savedBooks.filter(
+    (book) => book.status === "읽은 책"
+  ).length;
+
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900">
+      {/* 헤더 */}
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <div className="flex items-center gap-3">
@@ -90,7 +129,9 @@ export default function Home() {
 
             <div>
               <h1 className="text-xl font-bold">BOOKLOG</h1>
-              <p className="text-xs text-gray-500">나만의 독서 기록</p>
+              <p className="text-xs text-gray-500">
+                나만의 독서 기록
+              </p>
             </div>
           </div>
 
@@ -110,6 +151,7 @@ export default function Home() {
         </div>
       </header>
 
+      {/* 메인 소개 + 검색 */}
       <section className="mx-auto max-w-6xl px-6 pb-16 pt-20">
         <div className="max-w-3xl">
           <p className="mb-4 text-sm font-semibold text-indigo-600">
@@ -127,6 +169,7 @@ export default function Home() {
             관리할 수 있는 독서 관리 서비스입니다.
           </p>
 
+          {/* 검색창 */}
           <div
             id="search"
             className="mt-10 flex max-w-2xl gap-3 rounded-2xl border bg-white p-2 shadow-sm"
@@ -161,10 +204,13 @@ export default function Home() {
         </div>
       </section>
 
+      {/* 검색 결과 */}
       {books.length > 0 && (
         <section className="mx-auto max-w-6xl px-6 pb-20">
           <div className="mb-6">
-            <h3 className="text-2xl font-bold">검색 결과</h3>
+            <h3 className="text-2xl font-bold">
+              검색 결과
+            </h3>
 
             <p className="mt-1 text-sm text-gray-500">
               총 {books.length}개의 책을 찾았습니다.
@@ -177,6 +223,7 @@ export default function Home() {
                 key={book.googleId}
                 className="overflow-hidden rounded-2xl border bg-white shadow-sm"
               >
+                {/* 책 표지 */}
                 <div className="flex h-72 items-center justify-center bg-gray-100">
                   {book.thumbnail ? (
                     <img
@@ -189,13 +236,15 @@ export default function Home() {
                   )}
                 </div>
 
+                {/* 책 정보 */}
                 <div className="p-5">
                   <h4 className="line-clamp-2 font-bold">
                     {book.title}
                   </h4>
 
                   <p className="mt-2 line-clamp-1 text-sm text-gray-500">
-                    {book.authors?.join(", ") || "저자 정보 없음"}
+                    {book.authors?.join(", ") ||
+                      "저자 정보 없음"}
                   </p>
 
                   {book.publishedDate && (
@@ -217,31 +266,112 @@ export default function Home() {
         </section>
       )}
 
+      {/* 내 책장 통계 */}
       <section
         id="bookshelf"
-        className="mx-auto max-w-6xl px-6 pb-16"
+        className="mx-auto max-w-6xl px-6 pb-10"
       >
+        <div className="mb-6">
+          <h3 className="text-2xl font-bold">
+            내 책장
+          </h3>
+
+          <p className="mt-1 text-sm text-gray-500">
+            내가 저장한 책을 관리해보세요.
+          </p>
+        </div>
+
         <div className="grid gap-4 md:grid-cols-3">
           <StatCard
             title="전체 책"
-            value="0"
+            value={totalBooks}
             description="내 책장에 저장한 책"
           />
 
           <StatCard
             title="읽는 중"
-            value="0"
+            value={readingBooks}
             description="현재 읽고 있는 책"
           />
 
           <StatCard
             title="읽은 책"
-            value="0"
+            value={finishedBooks}
             description="완독한 책"
           />
         </div>
       </section>
 
+      {/* 실제 저장된 책 목록 */}
+      <section className="mx-auto max-w-6xl px-6 pb-20">
+        {savedBooks.length > 0 ? (
+          <>
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold">
+                저장한 책
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-500">
+                최근 저장한 책부터 보여줍니다.
+              </p>
+            </div>
+
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {savedBooks.map((book) => (
+                <article
+                  key={book.id}
+                  className="overflow-hidden rounded-2xl border bg-white shadow-sm"
+                >
+                  {/* 책 표지 */}
+                  <div className="flex h-72 items-center justify-center bg-gray-100">
+                    {book.thumbnail ? (
+                      <img
+                        src={book.thumbnail}
+                        alt={book.title}
+                        className="h-full w-full object-contain p-4"
+                      />
+                    ) : (
+                      <span className="text-5xl">
+                        📖
+                      </span>
+                    )}
+                  </div>
+
+                  {/* 책 정보 */}
+                  <div className="p-5">
+                    <h4 className="line-clamp-2 font-bold">
+                      {book.title}
+                    </h4>
+
+                    <p className="mt-2 line-clamp-1 text-sm text-gray-500">
+                      {book.authors?.join(", ") ||
+                        "저자 정보 없음"}
+                    </p>
+
+                    <div className="mt-4 inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+                      {book.status || "읽고 싶은 책"}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="rounded-2xl border border-dashed bg-white p-10 text-center">
+            <div className="text-5xl">📚</div>
+
+            <h3 className="mt-4 text-lg font-bold">
+              아직 저장한 책이 없습니다.
+            </h3>
+
+            <p className="mt-2 text-sm text-gray-500">
+              위에서 책을 검색하고 내 책장에 추가해보세요.
+            </p>
+          </div>
+        )}
+      </section>
+
+      {/* 푸터 */}
       <footer className="border-t bg-white">
         <div className="mx-auto max-w-6xl px-6 py-8 text-center text-xs text-gray-400">
           © 2026 BOOKLOG
@@ -251,12 +381,17 @@ export default function Home() {
   );
 }
 
+// 통계 카드
 function StatCard({ title, value, description }) {
   return (
     <div className="rounded-2xl border bg-white p-6">
-      <p className="text-sm text-gray-500">{title}</p>
+      <p className="text-sm text-gray-500">
+        {title}
+      </p>
 
-      <p className="mt-3 text-3xl font-bold">{value}</p>
+      <p className="mt-3 text-3xl font-bold">
+        {value}
+      </p>
 
       <p className="mt-2 text-xs text-gray-400">
         {description}
